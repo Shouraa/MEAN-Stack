@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 let dbURI = 'mongodb://localhost/Loc8r';
 
 if (process.env.NODE_ENV === 'production') {
-  dbURI = 'mongodb://shora:asghartaraghe59@ds115613.mlab.com:15613/loc8r-dev';
+  dbURI = 'mongodb://loc8r:loc8r2020@ds235180.mlab.com:35180/loc8r-devdb';
 }
 
 mongoose.connect(dbURI, {
