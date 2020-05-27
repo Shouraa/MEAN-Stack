@@ -5,7 +5,7 @@ let dbURI = 'mongodb://localhost/Loc8r';
 if (process.env.NODE_ENV === 'production') {
   dbURI = 'mongodb://loc8r:loc8r2020@ds235180.mlab.com:35180/loc8r-devdb';
 }
-
+console.log(process.env.NODE_ENV);
 mongoose.connect(dbURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
