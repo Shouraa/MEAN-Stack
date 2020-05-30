@@ -1,24 +1,11 @@
 const request = require('request');
 
 const apiOptions = {
-  server: 'http://http://localhost:3000/',
+  server: 'http://localhost:3000',
 };
 if (process.env.NODE_ENV === 'production') {
-  apiOptions.server = 'https://fast-stream-03241.herokuapp.com/';
+  apiOptions.server = 'https://fast-stream-03241.herokuapp.com';
 }
-
-const renderHomepage = (req, res, responseBody) => {
-  res.render('location-list', {
-    title: 'Loc8r - find a place to work with wifi',
-    pageHeader: {
-      title: 'Loc8r',
-      strapline: 'Find places to work with wifi near you!',
-    },
-    sidebar:
-      "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
-    locations: responseBody,
-  });
-};
 
 const homelist = (req, res) => {
   const path = '/api/locations';
@@ -29,12 +16,55 @@ const homelist = (req, res) => {
     qs: {
       lng: -0.7992599,
       lat: 51.378091,
-      maxDistance: 20,
+      maxDistance: 14000,
     },
   };
-  request(requestOptions, (err, response, body) => {
-    renderHomepage(req, res, body);
-    console.log(body);
+  request(requestOptions, (err, { statusCode }, body) => {
+    let data = [];
+    if (statusCode === 200) {
+      data = body.map((item) => {
+        item.distance = formatDistance(item.distance);
+        return item;
+      });
+
+      renderHomepage(req, res, data);
+    }
+  });
+};
+
+const formatDistance = (distance) => {
+  let thisDistance = 0;
+  let unit = 'm';
+  if (distance > 1000) {
+    thisDistance = parseFloat(distance / 1000).toFixed(1);
+    unit = 'km';
+  } else {
+    thisDistance = Math.floor(distance);
+  }
+  return thisDistance + unit;
+};
+
+// Render Homepage
+const renderHomepage = (req, res, responseBody) => {
+  let message = null;
+  if (!(responseBody instanceof Array)) {
+    message = 'API lookup error';
+    responseBody = [];
+  } else {
+    if (!responseBody.length) {
+      message = 'No places found nearby';
+    }
+  }
+  res.render('location-list', {
+    title: 'Loc8r - find a place to work with wifi',
+    pageHeader: {
+      title: 'Loc8r',
+      strapline: 'Find places to work with wifi near you!',
+    },
+    sidebar:
+      "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
+    locations: responseBody,
+    message,
   });
 };
 

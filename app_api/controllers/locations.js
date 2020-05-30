@@ -4,7 +4,7 @@ const Loc = mongoose.model('Location');
 const locationsListByDistance = async (req, res) => {
   const lng = parseFloat(req.query.lng);
   const lat = parseFloat(req.query.lat);
-  const maxDistance = parseFloat(req.query.maxDis);
+  const maxDistance = parseFloat(req.query.maxDistance);
   const near = {
     type: 'Point',
     coordinates: [lng, lat],
@@ -15,7 +15,7 @@ const locationsListByDistance = async (req, res) => {
     spherical: true,
     maxDistance,
   };
-  if (!lng || !lat) {
+  if ((!lng && lng !== 0) || (!lat && lat !== 0)) {
     return res
       .status(404)
       .json({ message: 'lng and lat query parameters are required' });
@@ -30,7 +30,6 @@ const locationsListByDistance = async (req, res) => {
       },
       { $limit: 10 },
     ]);
-
     const locations = results.map((result) => {
       return {
         id: result._id,
@@ -38,7 +37,7 @@ const locationsListByDistance = async (req, res) => {
         address: result.address,
         rating: result.rating,
         facilities: result.facilities,
-        distance: `${result.distance.calculated.toFixed()}m`,
+        distance: `${result.distance.calculated.toFixed()}`,
       };
     });
     return res.status(200).json(locations);
