@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Loc = mongoose.model('Location');
 
 const reviewsCreate = (req, res) => {
-  const locationId = req.params.locationid;
-  if (locationId) {
-    Loc.findById(locationId)
-      .select(reviews)
+  const locationid = req.params.locationid;
+  if (locationid) {
+    Loc.findById(locationid)
+      .select('reviews')
       .exec((err, location) => {
         if (err) {
           res.status(400).json(err);
@@ -30,6 +30,7 @@ const doAddReview = (req, res, location) => {
     });
     location.save((err, location) => {
       if (err) {
+        console.log(err);
         res.status(400).json(err);
       } else {
         updateAverageRating(location._id);
@@ -57,8 +58,8 @@ const doSetAverageRating = (location) => {
   }
 };
 
-const updateAverageRating = (locationId) => {
-  Loc.findById(locationId)
+const updateAverageRating = (locationid) => {
+  Loc.findById(locationid)
     .select('rating reviews')
     .exec((err, location) => {
       if (!err) {
