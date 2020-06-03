@@ -7,7 +7,9 @@ if (process.env.NODE_ENV === 'production') {
   apiOptions.server = 'https://fast-stream-03241.herokuapp.com';
 }
 
-/* API call for homepage  */
+// PUBLIC METHODS
+
+/* GET 'home' page  */
 const homelist = (req, res) => {
   const path = '/api/locations';
   requestOptions = {
@@ -17,7 +19,7 @@ const homelist = (req, res) => {
     qs: {
       lng: -0.7992599,
       lat: 51.378091,
-      maxDistance: 14000,
+      maxDistance: 15000,
     },
   };
   request(requestOptions, (err, { statusCode }, body) => {
@@ -33,77 +35,17 @@ const homelist = (req, res) => {
   });
 };
 
-const formatDistance = (distance) => {
-  let thisDistance = 0;
-  let unit = 'm';
-  if (distance > 1000) {
-    thisDistance = parseFloat(distance / 1000).toFixed(1);
-    unit = 'km';
-  } else {
-    thisDistance = Math.floor(distance);
-  }
-  return thisDistance + unit;
-};
-
-// Render Homepage
-const renderHomepage = (req, res, responseBody) => {
-  let message = null;
-  if (!(responseBody instanceof Array)) {
-    message = 'API lookup error';
-    responseBody = [];
-  } else {
-    if (!responseBody.length) {
-      message = 'No places found nearby';
-    }
-  }
-  res.render('location-list', {
-    title: 'Loc8r - find a place to work with wifi',
-    pageHeader: {
-      title: 'Loc8r',
-      strapline: 'Find places to work with wifi near you!',
-    },
-    sidebar:
-      "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
-    locations: responseBody,
-    message,
-  });
-};
-
-/* API call for detailPage  */
+/* GET 'location info' Page  */
 const locationInfo = (req, res) => {
   getLocationInfo(req, res, (req, res, responseData) =>
     renderDetailPage(req, res, responseData)
   );
 };
 
-/* API call for addReview page  */
+/* GET 'Add Review' page  */
 const addReview = (req, res) => {
   getLocationInfo(req, res, (req, res, responseData) => {
     renderReviewForm(req, res, responseData);
-  });
-};
-
-// Render detailPage
-const renderDetailPage = (req, res, location) => {
-  res.render('location-info', {
-    title: location.name,
-    pageHeader: { title: location.name },
-    sidebar: {
-      context:
-        'is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.',
-      callToAction:
-        "If you've been and you like it - or if you don't - please leave a review to help other people just like you.",
-    },
-    location,
-  });
-};
-
-/* Render review form */
-const renderReviewForm = (req, res, { name }) => {
-  res.render('location-review-form', {
-    title: `Review ${name} on Loc8r`,
-    pageHeader: { title: `Review ${name}` },
-    error: req.query.err,
   });
 };
 
@@ -141,6 +83,8 @@ const doAddReview = (req, res) => {
   }
 };
 
+// PRIVATE METHODS
+
 /* 'GET' location info */
 const getLocationInfo = (req, res, callback) => {
   const path = `/api/locations/${req.params.locationid}`;
@@ -163,7 +107,68 @@ const getLocationInfo = (req, res, callback) => {
   });
 };
 
-// Method for Showing Errors
+// Render Homepage
+const renderHomepage = (req, res, responseBody) => {
+  let message = null;
+  if (!(responseBody instanceof Array)) {
+    message = 'API lookup error';
+    responseBody = [];
+  } else {
+    if (!responseBody.length) {
+      message = 'No places found nearby';
+    }
+  }
+  res.render('location-list', {
+    title: 'Loc8r - find a place to work with wifi',
+    pageHeader: {
+      title: 'Loc8r',
+      strapline: 'Find places to work with wifi near you!',
+    },
+    sidebar:
+      "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
+    locations: responseBody,
+    message,
+  });
+};
+
+// Render detailPage
+const renderDetailPage = (req, res, location) => {
+  res.render('location-info', {
+    title: location.name,
+    pageHeader: { title: location.name },
+    sidebar: {
+      context:
+        'is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.',
+      callToAction:
+        "If you've been and you like it - or if you don't - please leave a review to help other people just like you.",
+    },
+    location,
+  });
+};
+
+/* Render review form */
+const renderReviewForm = (req, res, { name }) => {
+  res.render('location-review-form', {
+    title: `Review ${name} on Loc8r`,
+    pageHeader: { title: `Review ${name}` },
+    error: req.query.err,
+  });
+};
+
+/* Formatting the Distance  */
+const formatDistance = (distance) => {
+  let thisDistance = 0;
+  let unit = 'm';
+  if (distance > 1000) {
+    thisDistance = parseFloat(distance / 1000).toFixed(1);
+    unit = 'km';
+  } else {
+    thisDistance = Math.floor(distance);
+  }
+  return thisDistance + unit;
+};
+
+/* Method for Showing Errors */
 const showError = (req, res, status) => {
   let title = '';
   let content = '';
