@@ -6,7 +6,7 @@ const logger = require('morgan');
 const favicon = require('serve-favicon');
 require('./app_api/models/db');
 
-const indexRouter = require('./app_server/routes/index');
+// const indexRouter = require('./app_server/routes/index');
 const apiRouter = require('./app_api/routes/index');
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'app_public')));
+app.use(express.static(path.join(__dirname, 'app_public', 'build')));
 
 app.use('/api', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -31,7 +31,7 @@ app.use('/api', function (req, res, next) {
   next();
 });
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler

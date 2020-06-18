@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  apiBaseUrl: 'https://fast-stream-03241.herokuapp.com/',
+  production: true,
 };
